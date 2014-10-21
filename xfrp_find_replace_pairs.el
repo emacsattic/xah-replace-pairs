@@ -47,10 +47,10 @@
 
 ;;; Code:
 
-(defun replace-pairs-region (p1 p2 φpairs)
-  "Replace multiple ΦPAIRS of find/replace strings in region P1 P2.
+(defun replace-pairs-region (φp1 φp2 φpairs)
+  "Replace multiple φpairs of find/replace strings in region φp1 φp2.
 
-ΦPAIRS should be a sequence of φpairs [[findStr1 replaceStr1] [findStr2 replaceStr2] …] It can be list or vector, for the elements or the entire argument.  
+φpairs should be a sequence of φpairs [[findStr1 replaceStr1] [findStr2 replaceStr2] …] It can be list or vector, for the elements or the entire argument.  
 
 The find strings are not case sensitive. If you want case sensitive, set `case-fold-search' to nil. Like this: (let ((case-fold-search nil)) (replace-pairs-region …))
 
@@ -71,7 +71,7 @@ Note: the region's text or any string in φpairs is assumed to NOT contain any c
       (setq ξi (1+ ξi)))
     (save-excursion
       (save-restriction
-        (narrow-to-region p1 p2)
+        (narrow-to-region φp1 φp2)
 
         ;; replace each find string by corresponding item in tempMapPoints
         (setq ξi 0)
@@ -110,10 +110,10 @@ This function calls `replace-pairs-region' to do its work."
     outputStr
     ))
 
-(defun replace-regexp-pairs-in-string (str φpairs &optional fixedcase)
-  "Replace string STR recursively by regex find/replace pairs ΦPAIRS sequence.
+(defun replace-regexp-pairs-in-string (φstr φpairs &optional φfixedcase-p)
+  "Replace string ΦSTR recursively by regex find/replace pairs φpairs sequence.
 
-The second argument ΦPAIRS should be a sequence of pairs, e.g.
+The second argument φpairs should be a sequence of pairs, e.g.
  [[regexStr1 replaceStr1] [regexStr2 replaceStr2] …]
  It can be list or vector.
 
@@ -124,18 +124,18 @@ If you want the regex to be case sensitive, set the global
 variable `case-fold-search' to “nil”. Like this: (let ((case-fold-search nil)) (replace-regexp-pairs-in-string …))
 
 See also `replace-pairs-in-string'."
-  (let ((myStr str))
+  (let ((ξmyStr φstr))
     (mapc
-     (lambda (x) (setq myStr (replace-regexp-in-string (elt x 0) (elt x 1) myStr fixedcase)))
+     (lambda (x) (setq ξmyStr (replace-regexp-in-string (elt x 0) (elt x 1) ξmyStr φfixedcase-p)))
      φpairs)
-    myStr))
+    ξmyStr))
 
-(defun replace-regexp-pairs-region (p1 p2 φpairs &optional fixedcase literal)
-  "Replace regex string find/replace ΦPAIRS in region.
+(defun replace-regexp-pairs-region (φp1 φp2 φpairs &optional φfixedcase-p φliteral)
+  "Replace regex string find/replace φpairs in region.
 
-P1 P2 are the region boundaries.
+φp1 φp2 are the region boundaries.
 
-ΦPAIRS is
+φpairs is
  [[regexStr1 replaceStr1] [regexStr2 replaceStr2] …]
  It can be list or vector.
 
@@ -143,16 +143,16 @@ The optional arguments FIXEDCASE and LITERAL is the same as in `replace-match'.
 
 If you want the regex to be case sensitive, set the global
 variable `case-fold-search' to “nil”. Like this: (let ((case-fold-search nil)) (replace-regexp-pairs-region …))"
-  (let ( ξi currentPair (pairLength (length φpairs)))
+  (let ( ξi ξcurrentPair (ξpairLength (length φpairs)))
     (save-restriction
-      (narrow-to-region p1 p2)
+      (narrow-to-region φp1 φp2)
       (setq ξi 0)
-      (while (< ξi pairLength)
-        (setq currentPair (elt φpairs ξi))
+      (while (< ξi ξpairLength)
+        (setq ξcurrentPair (elt φpairs ξi))
         (goto-char (point-min))
-        (while (search-forward-regexp (elt currentPair 0) (point-max) t)
-          (replace-match (elt currentPair 1) fixedcase literal) )
-        (setq ξi (1+ ξi) ) ) ) ) )
+        (while (search-forward-regexp (elt ξcurrentPair 0) (point-max) t)
+          (replace-match (elt ξcurrentPair 1) φfixedcase-p φliteral))
+        (setq ξi (1+ ξi))))))
 
 (defun replace-pairs-in-string-recursive (φstr φpairs)
   "Replace string φstr recursively by find/replace pairs PAIRS sequence.
@@ -162,11 +162,10 @@ This function is similar to `replace-pairs-in-string', except that the replaceme
 For example, if the input string is “abcd”, and the pairs are a → c and c → d, then, the result is “dbdd” (not “cbdd”).
 
 See `replace-pairs-in-string' for full doc."
-  (let (myStr)
-    (setq myStr φstr)
+  (let ((ξmyStr φstr))
     (mapc
-     (lambda (x) (setq myStr (replace-regexp-in-string (regexp-quote (elt x 0)) (elt x 1) myStr t t)))
+     (lambda (x) (setq ξmyStr (replace-regexp-in-string (regexp-quote (elt x 0)) (elt x 1) ξmyStr t t)))
      φpairs)
-    myStr))
+    ξmyStr))
 
 (provide 'xfrp_find_replace_pairs)
