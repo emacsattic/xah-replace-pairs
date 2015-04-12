@@ -48,7 +48,7 @@
 
 ;;; Code:
 
-(defun replace-pairs-region (φp1 φp2 φpairs)
+(defun xah-replace-pairs-region (φp1 φp2 φpairs)
   "Replace multiple φpairs of find/replace strings in region φp1 φp2.
 
 φpairs should be a sequence of φpairs [[findStr1 replaceStr1] [findStr2 replaceStr2] …] It can be list or vector, for the elements or the entire argument.  
@@ -90,7 +90,7 @@ Note: the region's text or any string in φpairs is assumed to NOT contain any c
             (replace-match (elt (elt φpairs ξi) 1) t t))
           (setq ξi (1+ ξi)))))))
 
-(defun replace-pairs-in-string (φstr φpairs)
+(defun xah-replace-pairs-in-string (φstr φpairs)
   "Replace string φstr by find/replace φpairs sequence.
 
 Returns the new string.
@@ -111,7 +111,7 @@ This function calls `replace-pairs-region' to do its work."
     outputStr
     ))
 
-(defun replace-regexp-pairs-in-string (φstr φpairs &optional φfixedcase-p)
+(defun xah-replace-regexp-pairs-in-string (φstr φpairs &optional φfixedcase-p)
   "Replace string ΦSTR recursively by regex find/replace pairs φpairs sequence.
 
 The second argument φpairs should be a sequence of pairs, e.g.
@@ -131,7 +131,7 @@ See also `replace-pairs-in-string'."
      φpairs)
     ξmyStr))
 
-(defun replace-regexp-pairs-region (φp1 φp2 φpairs &optional φfixedcase-p φliteral)
+(defun xah-replace-regexp-pairs-region (φp1 φp2 φpairs &optional φfixedcase-p φliteral)
   "Replace regex string find/replace φpairs in region.
 
 φp1 φp2 are the region boundaries.
@@ -155,7 +155,7 @@ variable `case-fold-search' to “nil”. Like this: (let ((case-fold-search nil
           (replace-match (elt ξcurrentPair 1) φfixedcase-p φliteral))
         (setq ξi (1+ ξi))))))
 
-(defun replace-pairs-in-string-recursive (φstr φpairs)
+(defun xah-replace-pairs-in-string-recursive (φstr φpairs)
   "Replace string φstr recursively by find/replace pairs PAIRS sequence.
 
 This function is similar to `replace-pairs-in-string', except that the replacement is done recursively after each find/replace pair.  Earlier replaced value may be replaced again.
