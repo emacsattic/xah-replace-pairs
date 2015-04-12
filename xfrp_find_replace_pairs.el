@@ -127,7 +127,7 @@ variable `case-fold-search' to “nil”. Like this: (let ((case-fold-search nil
 See also `xah-replace-pairs-in-string'."
   (let ((ξmyStr φstr))
     (mapc
-     (lambda (x) (setq ξmyStr (replace-regexp-in-string (elt x 0) (elt x 1) ξmyStr φfixedcase-p)))
+     (lambda (ξx) (setq ξmyStr (replace-regexp-in-string (elt ξx 0) (elt ξx 1) ξmyStr φfixedcase-p)))
      φpairs)
     ξmyStr))
 
@@ -144,16 +144,14 @@ The optional arguments FIXEDCASE and LITERAL is the same as in `replace-match'.
 
 If you want the regex to be case sensitive, set the global
 variable `case-fold-search' to “nil”. Like this: (let ((case-fold-search nil)) (xah-replace-regexp-pairs-region …))"
-  (let ( ξi ξcurrentPair (ξpairLength (length φpairs)))
-    (save-restriction
+  (save-restriction
       (narrow-to-region φp1 φp2)
-      (setq ξi 0)
-      (while (< ξi ξpairLength)
-        (setq ξcurrentPair (elt φpairs ξi))
-        (goto-char (point-min))
-        (while (search-forward-regexp (elt ξcurrentPair 0) (point-max) t)
-          (replace-match (elt ξcurrentPair 1) φfixedcase-p φliteral))
-        (setq ξi (1+ ξi))))))
+      (mapc
+       (lambda (ξcurrentPair)
+         (goto-char (point-min))
+         (while (search-forward-regexp (elt ξcurrentPair 0) (point-max) t)
+           (replace-match (elt ξcurrentPair 1) φfixedcase-p φliteral)))
+       φpairs)))
 
 (defun xah-replace-pairs-in-string-recursive (φstr φpairs)
   "Replace string φstr recursively by find/replace pairs PAIRS sequence.
