@@ -51,7 +51,7 @@
 (defun xah-replace-pairs-region (φp1 φp2 φpairs)
   "Replace multiple φpairs of find/replace strings in region φp1 φp2.
 
-φpairs should be a sequence of φpairs [[findStr1 replaceStr1] [findStr2 replaceStr2] …] It can be list or vector, for the elements or the entire argument.  
+φpairs should be a sequence of φpairs [[findStr1 replaceStr1] [findStr2 replaceStr2] …] It can be list or vector, for the elements or the entire argument.
 
 The find strings are not case sensitive. If you want case sensitive, set `case-fold-search' to nil. Like this: (let ((case-fold-search nil)) (xah-replace-pairs-region …))
 
@@ -62,33 +62,34 @@ Once a subsring in the input string is replaced, that part is not changed again.
 Same as `xah-replace-pairs-in-string' except does on a region.
 
 Note: the region's text or any string in φpairs is assumed to NOT contain any character from Unicode Private Use Area A. That is, U+F0000 to U+FFFFD. And, there are no more than 65534 pairs."
-  (let (
+  (let* (
         (ξunicodePriveUseA #xf0000)
-        ξi (ξtempMapPoints '()))
+        (ξi 0)
+        (ξtempMapPoints
+         (mapc
+          (lambda (ξx)
+            (char-to-string (+ ξunicodePriveUseA ξx)))
+          (number-sequence 1 (length φpairs)))))
     ;; generate a list of Unicode chars for intermediate replacement. These chars are in  Private Use Area.
-    (setq ξi 0)
-    (while (< ξi (length φpairs))
-      (setq ξtempMapPoints (cons (char-to-string (+ ξunicodePriveUseA ξi)) ξtempMapPoints ))
-      (setq ξi (1+ ξi)))
     (save-excursion
       (save-restriction
         (narrow-to-region φp1 φp2)
-
-        ;; replace each find string by corresponding item in ξtempMapPoints
-        (setq ξi 0)
-        (while (< ξi (length φpairs))
-          (goto-char (point-min))
-          (while (search-forward (elt (elt φpairs ξi) 0) nil t)
-            (replace-match (elt ξtempMapPoints ξi) t t))
-          (setq ξi (1+ ξi)))
-
-        ;; replace each ξtempMapPoints by corresponding replacement string
-        (setq ξi 0)
-        (while (< ξi (length φpairs))
-          (goto-char (point-min))
-          (while (search-forward (elt ξtempMapPoints ξi) nil t)
-            (replace-match (elt (elt φpairs ξi) 1) t t))
-          (setq ξi (1+ ξi)))))))
+        (progn
+          ;; replace each find string by corresponding item in ξtempMapPoints
+          (setq ξi 0)
+          (while (< ξi (length φpairs))
+            (goto-char (point-min))
+            (while (search-forward (elt (elt φpairs ξi) 0) nil t)
+              (replace-match (elt ξtempMapPoints ξi) t t))
+            (setq ξi (1+ ξi))))
+        (progn
+          ;; replace each ξtempMapPoints by corresponding replacement string
+          (setq ξi 0)
+          (while (< ξi (length φpairs))
+            (goto-char (point-min))
+            (while (search-forward (elt ξtempMapPoints ξi) nil t)
+              (replace-match (elt (elt φpairs ξi) 1) t t))
+            (setq ξi (1+ ξi))))))))
 
 (defun xah-replace-pairs-in-string (φstr φpairs)
   "Replace string φstr by find/replace φpairs sequence.
