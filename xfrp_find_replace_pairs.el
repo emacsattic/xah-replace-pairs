@@ -62,15 +62,16 @@ Once a subsring in the input string is replaced, that part is not changed again.
 Same as `xah-replace-pairs-in-string' except does on a region.
 
 Note: the region's text or any string in φpairs is assumed to NOT contain any character from Unicode Private Use Area A. That is, U+F0000 to U+FFFFD. And, there are no more than 65534 pairs."
-  (let* (
+  (let (
         (ξunicodePriveUseA #xf0000)
         (ξi 0)
-        (ξtempMapPoints
-         (mapc
-          (lambda (ξx)
-            (char-to-string (+ ξunicodePriveUseA ξx)))
-          (number-sequence 1 (length φpairs)))))
-    ;; generate a list of Unicode chars for intermediate replacement. These chars are in  Private Use Area.
+        ξtempMapPoints)
+    (progn
+      ;; generate a list of Unicode chars for intermediate replacement. These chars are in  Private Use Area.
+      (setq ξi 0)
+      (while (< ξi (length φpairs))
+        (setq ξtempMapPoints (cons (char-to-string (+ ξunicodePriveUseA ξi)) ξtempMapPoints ))
+        (setq ξi (1+ ξi))))
     (save-excursion
       (save-restriction
         (narrow-to-region φp1 φp2)
