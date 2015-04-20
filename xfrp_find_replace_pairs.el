@@ -51,13 +51,13 @@
 (defun xah-replace-pairs-region (φp1 φp2 φpairs)
   "Replace multiple φpairs of find/replace strings in region φp1 φp2.
 
-φpairs should be a sequence of φpairs [[findStr1 replaceStr1] [findStr2 replaceStr2] …] It can be list or vector, for the elements or the entire argument.
+φpairs is a sequence of pairs [[findStr1 replaceStr1] [findStr2 replaceStr2] …] It can be list or vector, for the elements or the entire argument.
 
 The find strings are not case sensitive. If you want case sensitive, set `case-fold-search' to nil. Like this: (let ((case-fold-search nil)) (xah-replace-pairs-region …))
 
 The replacement are literal and case sensitive.
 
-Once a subsring in the input string is replaced, that part is not changed again.  For example, if the input string is “abcd”, and the φpairs are a → c and c → d, then, result is “cbdd”, not “dbdd”. If you simply want repeated replacements, use `xah-replace-pairs-in-string-recursive'.
+Once a subsring in the input string is replaced, that part will change again.  For example, if the input string is “abcd”, and the φpairs are a → c and c → d, then, result is “cbdd”, not “dbdd”. If you simply want repeated replacements, use `xah-replace-pairs-in-string-recursive'.
 
 Same as `xah-replace-pairs-in-string' except does on a region.
 
@@ -102,16 +102,10 @@ Example:
  '([\"a\" \"1\"] [\"b\" \"2\"] [\"c\" \"3\"]))  ⇒ “\"123def\"”.
 
 This function calls `xah-replace-pairs-region' to do its work."
-  (let (outputStr)
-    (setq outputStr
-          (with-temp-buffer
-            (insert φstr)
-            (xah-replace-pairs-region 1 (point-max) φpairs)
-            (buffer-string)
-            )
-          )
-    outputStr
-    ))
+  (with-temp-buffer
+    (insert φstr)
+    (xah-replace-pairs-region 1 (point-max) φpairs)
+    (buffer-string)))
 
 (defun xah-replace-regexp-pairs-in-string (φstr φpairs &optional φfixedcase-p)
   "Replace string ΦSTR recursively by regex find/replace pairs φpairs sequence.
