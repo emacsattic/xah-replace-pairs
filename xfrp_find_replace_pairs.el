@@ -1,37 +1,30 @@
 ;;; xfrp_find_replace_pairs.el --- elisp utility for string replacement. -*- coding: utf-8 -*-
 
-;; Copyright © 2010, 2011, 2012, by Xah Lee
+;; Copyright © 2010-2015, by Xah Lee
 
 ;; Author: Xah Lee ( http://xahlee.org/ )
-;; Created: 2010-08-17
-;; Keywords: emacs lisp, string, find replace
+;; Created: 17 Aug 2010
+;; Keywords: lisp, string, files, tools
+;; Homepage: http://ergoemacs.org/emacs/elisp_replace_string_region.html
+;; Version: 2.0.0
+
+;; This file is not part of GNU Emacs.
 
 ;; You can redistribute this program and/or modify it. Please give credit and link. Thanks.
 
-;;; DESCRIPTION
+;;; Commentary:
 
-;; this package is a emacs lisp utility.
-;; It provides the following functions:
+;; This package provides elisp function xah-replace-pairs-region and variations that does find/replace with multiple pairs of strings, and guarantees that earlier find/replace pair does not effect later find/replace pairs.
 
-;; xah-replace-pairs-in-string
-;; xah-replace-regexp-pairs-in-string
-;; xah-replace-pairs-region
-;; xah-replace-regexp-pairs-region
-;; xah-replace-pairs-in-string-recursive
-
-;; these are convenient functions that lets you do multiple find/replace pairs.
-
-;; For explanation of the need for these functions, see:
-;;  http://ergoemacs.org/emacs/elisp_replace_string_region.html
-
-;; donate $3 please. Paypal to xah@xahlee.org , thanks.
+;; Please Buy Xah Emacs Tutorial
+;; http://ergoemacs.org/emacs/buy_xah_emacs_tutorial.html
+;; Thanks.
 
 ;;; INSTALL
 
-;; Place the file in your emacs load path. Then
-;; (require 'xfrp_find_replace_pairs)
+;; Place the file in your emacs load path. Then (require 'xfrp_find_replace_pairs) in your lisp code.
 
-;;; HISTORY
+;;; History:
 
 ;; 2015-04-12 version changes basically no longer logged here.
 ;; version 1.5.1, 2013-02-22 • major rewrite. Last version 1.5.0 had a bug too. So, the algorithm is changed again. On testing, version 1.4.6 is 9 seconds, version 1.5.0 is 12 seconds, version 1.5.1 is 6 seconds.
@@ -57,11 +50,11 @@ The find strings are not case sensitive. If you want case sensitive, set `case-f
 
 The replacement are literal and case sensitive.
 
-Once a subsring in the input string is replaced, that part will change again.  For example, if the input string is “abcd”, and the φpairs are a → c and c → d, then, result is “cbdd”, not “dbdd”. If you simply want repeated replacements, use `xah-replace-pairs-in-string-recursive'.
+Once a subsring in the input string is replaced, that part will not change again.  For example, if the input string is “abcd”, and the φpairs are a → c and c → d, then, result is “cbdd”, not “dbdd”. If you simply want repeated replacements, use `xah-replace-pairs-in-string-recursive'.
 
 Same as `xah-replace-pairs-in-string' except does on a region.
 
-Note: the region's text or any string in φpairs is assumed to NOT contain any character from Unicode Private Use Area A. That is, U+F0000 to U+FFFFD. And, there are no more than 65534 pairs."
+Note: the region's text or any string in φpairs is assumed to NOT to contain any character from Unicode Private Use Area A. That is, U+F0000 to U+FFFFD. And, there are no more than 65534 pairs."
   (let (
         (ξunicodePriveUseA #xf0000)
         (ξi 0)
@@ -164,3 +157,5 @@ See `xah-replace-pairs-in-string' for full doc."
     ξmyStr))
 
 (provide 'xfrp_find_replace_pairs)
+
+;;; xfrp_find_replace_pairs.el ends here
