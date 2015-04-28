@@ -1,12 +1,12 @@
-;;; xfrp_find_replace_pairs.el --- elisp utility for string replacement. -*- coding: utf-8 -*-
+;;; xfrp_find_replace_pairs.el --- elisp lib for multi-pair find/replace string.
 
 ;; Copyright © 2010-2015, by Xah Lee
 
 ;; Author: Xah Lee ( http://xahlee.org/ )
-;; Created: 17 Aug 2010
-;; Keywords: lisp, string, files, tools
-;; Homepage: http://ergoemacs.org/emacs/elisp_replace_string_region.html
 ;; Version: 2.0.0
+;; Created: 17 Aug 2010
+;; Keywords: lisp, string, tools
+;; Homepage: http://ergoemacs.org/emacs/elisp_replace_string_region.html
 
 ;; This file is not part of GNU Emacs.
 
@@ -20,13 +20,13 @@
 ;; http://ergoemacs.org/emacs/buy_xah_emacs_tutorial.html
 ;; Thanks.
 
-;;; INSTALL
+;;; INSTALL:
 
-;; Place the file in your emacs load path. Then (require 'xfrp_find_replace_pairs) in your lisp code.
+;; Place the file in emacs's load path (see: `load-path')  (typically ~/emacs.d/lisp/). Then (require 'xfrp_find_replace_pairs) in your lisp code.
 
 ;;; History:
 
-;; 2015-04-12 version changes basically no longer logged here.
+;; 2015-04-12 version changes are no longer logged here.
 ;; version 1.5.1, 2013-02-22 • major rewrite. Last version 1.5.0 had a bug too. So, the algorithm is changed again. On testing, version 1.4.6 is 9 seconds, version 1.5.0 is 12 seconds, version 1.5.1 is 6 seconds.
 ;; version 1.5.0, 2013-02-17 • major rewrite. The algorithm has changed. The prev algo is O(n^2). The new algo is O(n). The prev algo works by replacing each string to unique string, then replace them by replacement. Also, the new algorithm fixed a bug in “xah-replace-pairs-region” and “xah-replace-pairs-in-string”, when you have a lot replacement pairs and many of the find string are single char. Example: (let ((case-fold-search nil)) (xah-replace-pairs-in-string "For a little fun today, i wrote “xah-convert-latin-alphabet-gothic”. This will replace all English alphabet by Gothic version (aka Blackletter, Fraktur) that's available in Unicode as characters. Here's the code." [ ["A" "𝔄"] ["B" "𝔅"] ["C" "ℭ"] ["D" "𝔇"] ["E" "𝔈"] ["F" "𝔉"] ["G" "𝔊"] ["H" "ℌ"] ["I" "ℑ"] ["J" "𝔍"] ["K" "𝔎"] ["L" "𝔏"] ["M" "𝔐"] ["N" "𝔑"] ["O" "𝔒"] ["P" "𝔓"] ["Q" "𝔔"] ["R" "ℜ"] ["S" "𝔖"] ["T" "𝔗"] ["U" "𝔘"] ["V" "𝔙"] ["W" "𝔚"] ["X" "𝔛"] ["Y" "𝔜"] ["Z" "ℨ"] ["a" "𝔞"] ["b" "𝔟"] ["c" "𝔠"] ["d" "𝔡"] ["e" "𝔢"] ["f" "𝔣"] ["g" "𝔤"] ["h" "𝔥"] ["i" "𝔦"] ["j" "𝔧"] ["k" "𝔨"] ["l" "𝔩"] ["m" "𝔪"] ["n" "𝔫"] ["o" "𝔬"] ["p" "𝔭"] ["q" "𝔮"] ["r" "𝔯"] ["s" "𝔰"] ["t" "𝔱"] ["u" "𝔲"] ["v" "𝔳"] ["w" "𝔴"] ["x" "𝔵"] ["y" "𝔶"] ["z" "𝔷"] ])) The unique strings are generated as a combination of rare Unicode char plus hexadecimal. The new algo generate a map of replacement positions instead.
 ;; version 1.4.6, 2012-07-05 • fixed several documentation error: mismatched paren in doc.
@@ -87,7 +87,6 @@ Note: the region's text or any string in φpairs is assumed to NOT to contain an
 
 (defun xah-replace-pairs-in-string (φstr φpairs)
   "Replace string φstr by find/replace φpairs sequence.
-
 Returns the new string.
 
 Example:
@@ -107,20 +106,23 @@ The second argument φpairs should be a sequence of pairs, e.g.
  [[regexStr1 replaceStr1] [regexStr2 replaceStr2] …]
  It can be list or vector.
 
-If third arg FIXEDCASE is non-nil, do not alter case of replacement text.
- (same as in `replace-match')
+If third arg φfixedcase-p is non-nil, do not alter case of replacement text. (same as in `replace-match')
 
 If you want the regex to be case sensitive, set the global
 variable `case-fold-search' to “nil”. Like this: (let ((case-fold-search nil)) (xah-replace-regexp-pairs-in-string …))
 
+This function calls `replace-regexp-in-string' repeatedly do the work.
+
 See also `xah-replace-pairs-in-string'."
   (let ((ξmyStr φstr))
     (mapc
-     (lambda (ξx) (setq ξmyStr (replace-regexp-in-string (elt ξx 0) (elt ξx 1) ξmyStr φfixedcase-p)))
+     (lambda (ξx)
+       (setq ξmyStr 
+             (replace-regexp-in-string (elt ξx 0) (elt ξx 1) ξmyStr φfixedcase-p)))
      φpairs)
     ξmyStr))
 
-(defun xah-replace-regexp-pairs-region (φp1 φp2 φpairs &optional φfixedcase-p φliteral)
+(defun xah-replace-regexp-pairs-region (φp1 φp2 φpairs &optional φfixedcase-p φliteral-p)
   "Replace regex string find/replace φpairs in region.
 
 φp1 φp2 are the region boundaries.
@@ -139,7 +141,7 @@ variable `case-fold-search' to “nil”. Like this: (let ((case-fold-search nil
        (lambda (ξcurrentPair)
          (goto-char (point-min))
          (while (search-forward-regexp (elt ξcurrentPair 0) (point-max) t)
-           (replace-match (elt ξcurrentPair 1) φfixedcase-p φliteral)))
+           (replace-match (elt ξcurrentPair 1) φfixedcase-p φliteral-p)))
        φpairs)))
 
 (defun xah-replace-pairs-in-string-recursive (φstr φpairs)
@@ -149,7 +151,7 @@ This function is similar to `xah-replace-pairs-in-string', except that the repla
 
 For example, if the input string is “abcd”, and the pairs are a → c and c → d, then, the result is “dbdd” (not “cbdd”).
 
-See `xah-replace-pairs-in-string' for full doc."
+See `xah-replace-pairs-in-string'."
   (let ((ξmyStr φstr))
     (mapc
      (lambda (x) (setq ξmyStr (replace-regexp-in-string (regexp-quote (elt x 0)) (elt x 1) ξmyStr t t)))
