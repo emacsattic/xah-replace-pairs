@@ -84,20 +84,20 @@ Note: the region's text or any string in ΦPAIRS is assumed to NOT contain any c
             (setq ξi (1+ ξi))))))))
 
 (defun xah-replace-pairs-in-string (φstr φpairs)
-  "Replace string φstr by find/replace φpairs sequence.
+  "Replace string ΦSTR by find/replace ΦPAIRS sequence.
 Returns the new string.
-This is a string version of `xah-replace-pairs-region'. See there for detail."
+This function is a wrapper of `xah-replace-pairs-region'. See there for detail."
   (with-temp-buffer
     (insert φstr)
     (xah-replace-pairs-region 1 (point-max) φpairs)
     (buffer-string)))
 
 (defun xah-replace-regexp-pairs-region (φbegin φend φpairs &optional φfixedcase-p φliteral-p)
-  "Replace regex string find/replace φpairs in region.
+  "Replace regex string find/replace ΦPAIRS in region.
 
-φbegin φend are the region boundaries.
+ΦBEGIN ΦEND are the region boundaries.
 
-φpairs is
+ΦPAIRS is
  [[regexStr1 replaceStr1] [regexStr2 replaceStr2] …]
  It can be list or vector.
 
@@ -116,7 +116,7 @@ If you want the regex to be case sensitive, set the global variable `case-fold-s
 (defun xah-replace-regexp-pairs-in-string (φstr φpairs &optional φfixedcase-p φliteral-p)
   "Replace string ΦSTR recursively by regex find/replace pairs ΦPAIRS sequence.
 
-This function calls `xah-replace-regexp-pairs-region' to do its work. See there for argument detail.
+This function is a wrapper of `xah-replace-regexp-pairs-region'. See there for detail.
 
 See also `xah-replace-pairs-in-string'."
   (with-temp-buffer 
@@ -126,7 +126,7 @@ See also `xah-replace-pairs-in-string'."
     (buffer-string)))
 
 (defun xah-replace-pairs-region-recursive (φbegin φend φpairs)
-  "Replace multiple φpairs of find/replace strings in region φbegin φend.
+  "Replace multiple ΦPAIRS of find/replace strings in region ΦBEGIN ΦEND.
 
 This function is similar to `xah-replace-pairs-region', except that the replacement is done recursively after each find/replace pair.  Earlier replaced value may be replaced again.
 
@@ -134,36 +134,25 @@ For example, if the input string is “abcd”, and the pairs are a → c and c 
 
 Find strings case sensitivity depends on `case-fold-search'. You can set it locally, like this: (let ((case-fold-search nil)) (xah-replace-pairs-region-recursive …))
 
-The replacement are literal and case sensitive.
-
-See `xah-replace-pairs-in-string'."
+The replacement are literal and case sensitive."
   (save-restriction
     (narrow-to-region φbegin φend)
     (mapc
      (lambda (x)
        (goto-char (point-min))
        (while (search-forward (elt x 0) (point-max) 'NOERROR)
-         (replace-match (elt x 1) φfixedcase-p φliteral-p)))
+         (replace-match (elt x 1) t t)))
      φpairs)))
 
 (defun xah-replace-pairs-in-string-recursive (φstr φpairs)
-  "Replace string ΦSTR recursively by find/replace pairs φpairs sequence.
+  "Replace string ΦSTR recursively by find/replace pairs ΦPAIRS sequence.
 
-This function is similar to `xah-replace-pairs-in-string', except that the replacement is done recursively after each find/replace pair.  Earlier replaced value may be replaced again.
-
-For example, if the input string is “abcd”, and the pairs are a → c and c → d, then, the result is “dbdd”, not “cbdd”.
-
-See `xah-replace-pairs-in-string'."
-  (let ((ξmyStr φstr))
-    (mapc
-     (lambda (x)
-       (setq ξmyStr
-             (replace-regexp-in-string
-              (regexp-quote (elt x 0))
-              (elt x 1)
-              ξmyStr t t)))
-     φpairs)
-    ξmyStr))
+This function is is a wrapper of `xah-replace-pairs-region-recursive'. See there for detail."
+  (with-temp-buffer
+    (insert φstr)
+    (goto-char (point-min))
+    (xah-replace-pairs-region-recursive (point-min) (point-max) φpairs)
+    (buffer-string)))
 
 (provide 'xah-replace-pairs)
 
