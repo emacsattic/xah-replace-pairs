@@ -1,11 +1,11 @@
-;;; xah-replace-pairs.el --- elisp lib for multi-pair find/replace string.
+;;; xah-replace-pairs.el --- emacs lisp functions for multi-pair find/replace string.
 
 ;; Copyright © 2010-2015, by Xah Lee
 
 ;; Author: Xah Lee ( http://xahlee.org/ )
 ;; Version: 2.0.1
 ;; Created: 17 Aug 2010
-;; Keywords: lisp, string, tools
+;; Keywords: lisp, tools
 ;; Homepage: http://ergoemacs.org/emacs/elisp_replace_string_region.html
 
 ;; This file is not part of GNU Emacs.
