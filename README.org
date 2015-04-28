@@ -1,0 +1,4 @@
+A emacs lisp package that provides elisp function
+xah-replace-pairs-region and variations that does find/replace with
+multiple pairs of strings, and guarantees that earlier find/replace
+pair does not effect later find/replace pairs.
