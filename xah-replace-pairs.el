@@ -46,7 +46,7 @@
  [[findStr1 replaceStr1] [findStr2 replaceStr2] …]
 It can be list or vector, for the elements or the entire argument.
 
-Find strings case sensitivity depends on `case-fold-search'. You can set it locally, like this: (let ((case-fold-search nil)) (xah-replace-pairs-region …))
+Find strings case sensitivity depends on `case-fold-search'. You can set it locally, like this: (let ((case-fold-search nil)) …)
 
 The replacement are literal and case sensitive.
 
@@ -99,18 +99,18 @@ This function is a wrapper of `xah-replace-pairs-region'. See there for detail."
 
 ΦPAIRS is
  [[regexStr1 replaceStr1] [regexStr2 replaceStr2] …]
- It can be list or vector.
+It can be list or vector, for the elements or the entire argument.
 
 The optional arguments ΦFIXEDCASE-P and ΦLITERAL-P is the same as in `replace-match'.
 
-If you want the regex to be case sensitive, set the global variable `case-fold-search' to “nil”. Like this: (let ((case-fold-search nil)) (xah-replace-regexp-pairs-region …))"
+Find strings case sensitivity depends on `case-fold-search'. You can set it locally, like this: (let ((case-fold-search nil)) …)"
   (save-restriction
       (narrow-to-region φbegin φend)
       (mapc
-       (lambda (ξcurrentPair)
+       (lambda (ξx)
          (goto-char (point-min))
-         (while (search-forward-regexp (elt ξcurrentPair 0) (point-max) t)
-           (replace-match (elt ξcurrentPair 1) φfixedcase-p φliteral-p)))
+         (while (search-forward-regexp (elt ξx 0) (point-max) t)
+           (replace-match (elt ξx 1) φfixedcase-p φliteral-p)))
        φpairs)))
 
 (defun xah-replace-regexp-pairs-in-string (φstr φpairs &optional φfixedcase-p φliteral-p)
@@ -132,7 +132,7 @@ This function is similar to `xah-replace-pairs-region', except that the replacem
 
 For example, if the input string is “abcd”, and the pairs are a → c and c → d, then, the result is “dbdd”, not “cbdd”.
 
-Find strings case sensitivity depends on `case-fold-search'. You can set it locally, like this: (let ((case-fold-search nil)) (xah-replace-pairs-region-recursive …))
+Find strings case sensitivity depends on `case-fold-search'. You can set it locally, like this: (let ((case-fold-search nil)) …)
 
 The replacement are literal and case sensitive."
   (save-restriction
