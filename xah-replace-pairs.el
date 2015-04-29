@@ -1,4 +1,4 @@
-;;; xah-replace-pairs.el --- elisp lib for multi-pair find/replace string.
+;;; xah-replace-pairs.el --- Multi-pair find/replace in strings and region.
 
 ;; Copyright © 2010-2015, by Xah Lee
 
