@@ -5,16 +5,18 @@
 ;; Author: Xah Lee ( http://xahlee.org/ )
 ;; Version: 2.0.1
 ;; Created: 17 Aug 2010
-;; Keywords: lisp, tools
-;; Homepage: http://ergoemacs.org/emacs/elisp_replace_string_region.html
+;; Keywords: lisp, tools, find replace
+;; URL: http://ergoemacs.org/emacs/elisp_replace_string_region.html
 
 ;; This file is not part of GNU Emacs.
 
-;; You can redistribute this program and/or modify it. Please give credit and link. Thanks.
+;; You can redistribute this program and/or modify it under the terms of the GNU General Public License version 2.
 
 ;;; Commentary:
 
-;; This package provides elisp function xah-replace-pairs-region and variations that do find/replace with multiple pairs of strings.
+;; This package provides elisp functions that do find/replace with multiple pairs of strings. and guarantees that earlier find/replace pair does not effect later find/replace pairs.
+
+;; The functions are:
 
 ;; xah-replace-pairs-region
 ;; xah-replace-pairs-in-string
@@ -23,13 +25,14 @@
 ;; xah-replace-pairs-region-recursive
 ;; xah-replace-pairs-in-string-recursive
 
-;; Please Buy Xah Emacs Tutorial
+;; Call `describe-function' on them for detail.
+
+;; Or, see home page at
+;; http://ergoemacs.org/emacs/elisp_replace_string_region.html
+
+;; If you like it, please support by Buy Xah Emacs Tutorial
 ;; http://ergoemacs.org/emacs/buy_xah_emacs_tutorial.html
 ;; Thanks.
-
-;;; INSTALL:
-
-;; Place the file in emacs's load path (see: `load-path')  (typically ~/emacs.d/lisp/). Then (require 'xah-replace-pairs) in your lisp code.
 
 ;;; History:
 
@@ -119,7 +122,7 @@ Find strings case sensitivity depends on `case-fold-search'. You can set it loca
 This function is a wrapper of `xah-replace-regexp-pairs-region'. See there for detail.
 
 See also `xah-replace-pairs-in-string'."
-  (with-temp-buffer 
+  (with-temp-buffer
     (insert φstr)
     (goto-char (point-min))
     (xah-replace-regexp-pairs-region (point-min) (point-max) φpairs φfixedcase-p φliteral-p)
