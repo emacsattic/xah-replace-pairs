@@ -3,7 +3,7 @@
 ;; Copyright © 2010-2015, by Xah Lee
 
 ;; Author: Xah Lee ( http://xahlee.org/ )
-;; Version: 2.0.1
+;; Version: 2.0.2
 ;; Created: 17 Aug 2010
 ;; Keywords: lisp, tools, find replace
 ;; URL: http://ergoemacs.org/emacs/elisp_replace_string_region.html
@@ -47,7 +47,7 @@
 
 ΦPAIRS is a sequence of pairs
  [[findStr1 replaceStr1] [findStr2 replaceStr2] …]
-It can be list or vector, for the elements or the entire argument.
+each element or entire argument can be list or vector.
 
 Find strings case sensitivity depends on `case-fold-search'. You can set it locally, like this: (let ((case-fold-search nil)) …)
 
@@ -55,7 +55,8 @@ The replacement are literal and case sensitive.
 
 Once a subsring in the buffer is replaced, that part will not change again.  For example, if the buffer content is “abcd”, and the φpairs are a → c and c → d, then, result is “cbdd”, not “dbdd”.
 
-Note: the region's text or any string in ΦPAIRS is assumed to NOT contain any character from Unicode Private Use Area A. That is, U+F0000 to U+FFFFD. And, there are no more than 65534 pairs."
+Note: the region's text or any string in ΦPAIRS is assumed to NOT contain any character from Unicode Private Use Area A. That is, U+F0000 to U+FFFFD. And, there are no more than 65534 pairs.
+Version 2016-07-07"
   (let (
         (ξunicodePriveUseA #xf0000)
         (ξi 0)
