@@ -3,7 +3,7 @@
 ;; Copyright © 2010-2015, by Xah Lee
 
 ;; Author: Xah Lee ( http://xahlee.org/ )
-;; Version: 2.0.4
+;; Version: 2.1.0
 ;; Created: 17 Aug 2010
 ;; Keywords: lisp, tools, find replace
 ;; URL: http://ergoemacs.org/emacs/elisp_replace_string_region.html
@@ -42,7 +42,7 @@
 
 ;;; Code:
 
-(defun xah-replace-pairs-region (*begin *end *pairs)
+(defun xah-replace-pairs-region (*begin *end *pairs &optional *report-p)
   "Replace multiple *PAIRS of find/replace strings in region *BEGIN *END.
 
 *PAIRS is a sequence of pairs
@@ -55,12 +55,17 @@ The replacement are literal and case sensitive.
 
 Once a subsring in the buffer is replaced, that part will not change again.  For example, if the buffer content is “abcd”, and the *pairs are a → c and c → d, then, result is “cbdd”, not “dbdd”.
 
+*REPORT-P is t or nil. If t, it prints each replaced pairs, one pair per line.
+
+Returns a list, each element is a vector [position findStr replaceStr].
+
 Note: the region's text or any string in *PAIRS is assumed to NOT contain any character from Unicode Private Use Area A. That is, U+F0000 to U+FFFFD. And, there are no more than 65534 pairs.
 Version 2016-07-07"
   (let (
         (-unicodePriveUseA #xf0000)
         (-i 0)
-        (-tempMapPoints '()))
+        (-tempMapPoints '())
+        (-changeLog '()))
     (progn
       ;; generate a list of Unicode chars for intermediate replacement. These chars are in  Private Use Area.
       (setq -i 0)
@@ -84,8 +89,21 @@ Version 2016-07-07"
           (while (< -i (length *pairs))
             (goto-char (point-min))
             (while (search-forward (elt -tempMapPoints -i) nil t)
+              (push (vector (point)
+                            (elt (elt *pairs -i) 0)
+                            (elt (elt *pairs -i) 1)) -changeLog)
               (replace-match (elt (elt *pairs -i) 1) t t))
-            (setq -i (1+ -i))))))))
+            (setq -i (1+ -i))))))
+
+    (when (and *report-p (> (length -changeLog) 0))
+      (mapcar
+       (lambda (-x)
+         (princ -x)
+         (terpri))
+       (reverse -changeLog)))
+
+    -changeLog
+    ))
 
 (defun xah-replace-pairs-in-string (*str *pairs)
   "Replace string *STR by find/replace *PAIRS sequence.
