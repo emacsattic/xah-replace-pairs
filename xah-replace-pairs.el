@@ -3,7 +3,7 @@
 ;; Copyright © 2010-2015, by Xah Lee
 
 ;; Author: Xah Lee ( http://xahlee.org/ )
-;; Version: 2.1.0
+;; Version: 2.2.0
 ;; Created: 17 Aug 2010
 ;; Keywords: lisp, tools, find replace
 ;; URL: http://ergoemacs.org/emacs/elisp_replace_string_region.html
@@ -42,7 +42,7 @@
 
 ;;; Code:
 
-(defun xah-replace-pairs-region (*begin *end *pairs &optional *report-p)
+(defun xah-replace-pairs-region (*begin *end *pairs &optional *report-p *hilight-p)
   "Replace multiple *PAIRS of find/replace strings in region *BEGIN *END.
 
 *PAIRS is a sequence of pairs
@@ -60,7 +60,7 @@ Once a subsring in the buffer is replaced, that part will not change again.  For
 Returns a list, each element is a vector [position findStr replaceStr].
 
 Note: the region's text or any string in *PAIRS is assumed to NOT contain any character from Unicode Private Use Area A. That is, U+F0000 to U+FFFFD. And, there are no more than 65534 pairs.
-Version 2016-07-07"
+Version 2016-10-05"
   (let (
         (-unicodePriveUseA #xf0000)
         (-i 0)
@@ -92,7 +92,9 @@ Version 2016-07-07"
               (push (vector (point)
                             (elt (elt *pairs -i) 0)
                             (elt (elt *pairs -i) 1)) -changeLog)
-              (replace-match (elt (elt *pairs -i) 1) t t))
+              (replace-match (elt (elt *pairs -i) 1) t t)
+              (when *hilight-p
+                (overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'face 'highlight)))
             (setq -i (1+ -i))))))
 
     (when (and *report-p (> (length -changeLog) 0))
@@ -114,7 +116,7 @@ This function is a wrapper of `xah-replace-pairs-region'. See there for detail."
     (xah-replace-pairs-region 1 (point-max) *pairs)
     (buffer-string)))
 
-(defun xah-replace-regexp-pairs-region (*begin *end *pairs &optional *fixedcase-p *literal-p)
+(defun xah-replace-regexp-pairs-region (*begin *end *pairs &optional *fixedcase-p *literal-p *hilight-p)
   "Replace regex string find/replace *PAIRS in region.
 
 *BEGIN *END are the region boundaries.
@@ -124,16 +126,20 @@ This function is a wrapper of `xah-replace-pairs-region'. See there for detail."
 It can be list or vector, for the elements or the entire argument.
 
 The optional arguments *FIXEDCASE-P and *LITERAL-P is the same as in `replace-match'.
+If *hilight-p is true, highlight the changed region.
 
-Find strings case sensitivity depends on `case-fold-search'. You can set it locally, like this: (let ((case-fold-search nil)) …)"
+Find strings case sensitivity depends on `case-fold-search'. You can set it locally, like this: (let ((case-fold-search nil)) …)
+Version 2016-10-05"
   (save-restriction
-      (narrow-to-region *begin *end)
-      (mapc
-       (lambda (-x)
-         (goto-char (point-min))
-         (while (search-forward-regexp (elt -x 0) (point-max) t)
-           (replace-match (elt -x 1) *fixedcase-p *literal-p)))
-       *pairs)))
+    (narrow-to-region *begin *end)
+    (mapc
+     (lambda (-x)
+       (goto-char (point-min))
+       (while (search-forward-regexp (elt -x 0) (point-max) t)
+         (replace-match (elt -x 1) *fixedcase-p *literal-p)
+         (when *hilight-p
+           (overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'face 'highlight))))
+     *pairs)))
 
 (defun xah-replace-regexp-pairs-in-string (*str *pairs &optional *fixedcase-p *literal-p)
   "Replace string *STR recursively by regex find/replace pairs *PAIRS sequence.
