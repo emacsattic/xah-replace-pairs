@@ -2,7 +2,7 @@
 
 ;; Copyright © 2010-2015, by Xah Lee
 
-;; Author: Xah Lee ( http://xahlee.org/ )
+;; Author: Xah Lee ( http://xahlee.info/ )
 ;; Version: 2.2.0
 ;; Created: 17 Aug 2010
 ;; Keywords: lisp, tools, find replace
@@ -98,7 +98,7 @@ Version 2016-10-05"
             (setq -i (1+ -i))))))
 
     (when (and *report-p (> (length -changeLog) 0))
-      (mapcar
+      (mapc
        (lambda (-x)
          (princ -x)
          (terpri))
