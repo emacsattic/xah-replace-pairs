@@ -3,7 +3,7 @@
 ;; Copyright © 2010-2016, by Xah Lee
 
 ;; Author: Xah Lee ( http://xahlee.info/ )
-;; Version: 2.2.2
+;; Version: 2.2.3
 ;; Created: 17 Aug 2010
 ;; Package-Requires: ((emacs "24.1"))
 ;; Keywords: lisp, tools, find replace
@@ -163,13 +163,14 @@ For example, if the input string is “abcd”, and the pairs are a → c and c 
 
 Find strings case sensitivity depends on `case-fold-search'. You can set it locally, like this: (let ((case-fold-search nil)) …)
 
-The replacement are literal and case sensitive."
+The replacement are literal and case sensitive.
+Version 2017-01-11"
   (save-restriction
     (narrow-to-region *begin *end)
     (mapc
      (lambda (x)
        (goto-char (point-min))
-       (while (search-forward (elt x 0) (point-max) 'NOERROR)
+       (while (search-forward (elt x 0) (point-max) "NOERROR")
          (replace-match (elt x 1) t t)))
      *pairs)))
 
