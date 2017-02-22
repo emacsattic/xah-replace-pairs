@@ -3,7 +3,7 @@
 ;; Copyright © 2010-2016, by Xah Lee
 
 ;; Author: Xah Lee ( http://xahlee.info/ )
-;; Version: 2.2.3
+;; Version: 2.2.4
 ;; Created: 17 Aug 2010
 ;; Package-Requires: ((emacs "24.1"))
 ;; Keywords: lisp, tools, find replace
@@ -61,7 +61,7 @@ Once a subsring in the buffer is replaced, that part will not change again.  For
 Returns a list, each element is a vector [position findStr replaceStr].
 
 Note: the region's text or any string in *PAIRS is assumed to NOT contain any character from Unicode Private Use Area A. That is, U+F0000 to U+FFFFD. And, there are no more than 65534 pairs.
-Version 2016-10-05"
+Version 2017-02-07"
   (let (
         (-unicodePriveUseA #xf0000)
         (-i 0)
@@ -95,7 +95,9 @@ Version 2016-10-05"
                             (elt (elt *pairs -i) 1)) -changeLog)
               (replace-match (elt (elt *pairs -i) 1) t t)
               (when *hilight-p
-                (overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'face 'highlight)))
+                (overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'face '((t :background "red" :foreground "white")))
+                ;;
+                ))
             (setq -i (1+ -i))))))
 
     (when (and *report-p (> (length -changeLog) 0))
@@ -130,17 +132,18 @@ The optional arguments *FIXEDCASE-P and *LITERAL-P is the same as in `replace-ma
 If *hilight-p is true, highlight the changed region.
 
 Find strings case sensitivity depends on `case-fold-search'. You can set it locally, like this: (let ((case-fold-search nil)) …)
-Version 2016-10-05"
-  (save-restriction
-    (narrow-to-region *begin *end)
-    (mapc
-     (lambda (-x)
-       (goto-char (point-min))
-       (while (search-forward-regexp (elt -x 0) (point-max) t)
-         (replace-match (elt -x 1) *fixedcase-p *literal-p)
-         (when *hilight-p
-           (overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'face 'highlight))))
-     *pairs)))
+Version 2017-02-21"
+  (save-excursion
+    (save-restriction
+      (narrow-to-region *begin *end)
+      (mapc
+       (lambda (-x)
+         (goto-char (point-min))
+         (while (search-forward-regexp (elt -x 0) (point-max) t)
+           (replace-match (elt -x 1) *fixedcase-p *literal-p)
+           (when *hilight-p
+             (overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'face 'highlight))))
+       *pairs))))
 
 (defun xah-replace-regexp-pairs-in-string (*str *pairs &optional *fixedcase-p *literal-p)
   "Replace string *STR recursively by regex find/replace pairs *PAIRS sequence.
@@ -164,15 +167,16 @@ For example, if the input string is “abcd”, and the pairs are a → c and c 
 Find strings case sensitivity depends on `case-fold-search'. You can set it locally, like this: (let ((case-fold-search nil)) …)
 
 The replacement are literal and case sensitive.
-Version 2017-01-11"
-  (save-restriction
-    (narrow-to-region *begin *end)
-    (mapc
-     (lambda (x)
-       (goto-char (point-min))
-       (while (search-forward (elt x 0) (point-max) "NOERROR")
-         (replace-match (elt x 1) t t)))
-     *pairs)))
+Version 2017-02-21"
+  (save-excursion
+    (save-restriction
+      (narrow-to-region *begin *end)
+      (mapc
+       (lambda (x)
+         (goto-char (point-min))
+         (while (search-forward (elt x 0) (point-max) "NOERROR")
+           (replace-match (elt x 1) t t)))
+       *pairs))))
 
 (defun xah-replace-pairs-in-string-recursive (*str *pairs)
   "Replace string *STR recursively by find/replace pairs *PAIRS sequence.
