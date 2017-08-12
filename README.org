@@ -13,3 +13,12 @@ The functions are:
 
 For detail, see Homepage
  http://ergoemacs.org/emacs/elisp_replace_string_region.html 
+
+Put in 5 bucks in my patreon.
+https://www.patreon.com/xahlee
+
+or http://paypal.com
+pay to xah@xahlee.org
+
+Thanks.
+
