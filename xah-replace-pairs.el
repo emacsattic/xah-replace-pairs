@@ -3,7 +3,7 @@
 ;; Copyright © 2010-2018, by Xah Lee
 
 ;; Author: Xah Lee ( http://xahlee.info/ )
-;; Version: 2.3.20180505232634
+;; Version: 2.3.20180506113436
 ;; Created: 17 Aug 2010
 ;; Package-Requires: ((emacs "24.1"))
 ;; Keywords: lisp, tools, find replace
@@ -61,7 +61,7 @@ Returns a list, each element is a vector [position findStr replaceStr].
 
 Version 2018-05-05"
   (let (
-        ($randomStr "ζ北k2rtm")
+        ($randomStr "ζ北κ铜2ρ")
         ($i 0)
         ($tempMapPoints '())
         ($changeLog '()))
