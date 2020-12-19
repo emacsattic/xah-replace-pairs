@@ -1,9 +1,9 @@
 ;;; xah-replace-pairs.el --- emacs lisp functions for multi-pair find/replace.  -*- coding: utf-8; lexical-binding: t; -*-
 
-;; Copyright © 2010-2018, by Xah Lee
+;; Copyright © 2010-2020, by Xah Lee
 
 ;; Author: Xah Lee ( http://xahlee.info/ )
-;; Version: 2.3.20180507194855
+;; Version: 2.5.20201218234056
 ;; Created: 17 Aug 2010
 ;; Package-Requires: ((emacs "24.1"))
 ;; Keywords: lisp, tools, find replace
@@ -45,13 +45,9 @@
 (defun xah-replace-pairs-region (@begin @end @pairs &optional @report-p @hilight-p)
   "Replace multiple @PAIRS of find/replace strings in region @BEGIN @END.
 
-@PAIRS is a sequence of pairs
- [[findStr1 replaceStr1] [findStr2 replaceStr2] …]
-each element or entire argument can be list or vector.
+@PAIRS is a sequence of pairs [[f1 r1] [f2 r2] …] each element or entire argument can be list or vector. f are find string, r are replace string.
 
-Find strings case sensitivity depends on `case-fold-search'. You can set it locally, like this: (let ((case-fold-search nil)) …)
-
-The replacement are literal and case sensitive.
+Find strings case sensitivity depends on `case-fold-search'. The replacement are literal and case sensitive.
 
 Once a subsring in the buffer is replaced, that part will not change again.  For example, if the buffer content is “abcd”, and the @pairs are a → c and c → d, then, result is “cbdd”, not “dbdd”.
 
@@ -59,54 +55,34 @@ Once a subsring in the buffer is replaced, that part will not change again.  For
 
 Returns a list, each element is a vector [position findStr replaceStr].
 
-Version 2018-05-07"
-  (let (
-        ($randomStr "ζ北ρ铜9")
-        ($i 0)
-        ($tempMapPoints '())
-        ($changeLog '()))
-    (progn
-      ;; generate a list of Unicode chars for intermediate replacement. These chars are in  Private Use Area.
-      (setq $i 0)
-      (while (< $i (length @pairs))
-        (push (concat $randomStr (number-to-string $i)) $tempMapPoints)
-        (setq $i (1+ $i))))
-
+Version 2020-12-18"
+  (let ( ($tempMapPoints nil) ($changeLog nil))
+    ;; set $tempMapPoints, to unicode private use area chars
+    (dotimes (i (length @pairs)) (push (char-to-string (+ #xe000 i)) $tempMapPoints))
+    ;; (message "%s" @pairs)
+    ;; (message "%s" $tempMapPoints)
     (save-excursion
       (save-restriction
         (narrow-to-region @begin @end)
-        (progn
-          ;; replace each find string by corresponding item in $tempMapPoints
-          (setq $i 0)
-          (while (< $i (length @pairs))
-            (goto-char (point-min))
-            (while (search-forward (elt (elt @pairs $i) 0) nil t)
-              (replace-match (elt $tempMapPoints $i) t t))
-            (setq $i (1+ $i))))
-        (progn
-          ;; replace each $tempMapPoints by corresponding replacement string
-          (setq $i 0)
-          (while (< $i (length @pairs))
-            (goto-char (point-min))
-            (while (search-forward (elt $tempMapPoints $i) nil t)
-              (push (vector (point)
-                            (elt (elt @pairs $i) 0)
-                            (elt (elt @pairs $i) 1)) $changeLog)
-              (replace-match (elt (elt @pairs $i) 1) t t)
-              (when @hilight-p
-                ;; (overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'face '((t :background "red" :foreground "white")))
-                (overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'face 'highlight)
-                ;;
-                ))
-            (setq $i (1+ $i))))))
-
+        (dotimes (i (length @pairs))
+          (goto-char (point-min))
+          (while (search-forward (elt (elt @pairs i) 0) nil t)
+            (replace-match (elt $tempMapPoints i) t t)))
+        (dotimes (i (length @pairs))
+          (goto-char (point-min))
+          (while (search-forward (elt $tempMapPoints i) nil t)
+            (push (vector (point)
+                          (elt (elt @pairs i) 0)
+                          (elt (elt @pairs i) 1)) $changeLog)
+            (replace-match (elt (elt @pairs i) 1) t t)
+            (when @hilight-p
+              (overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'face 'highlight))))))
     (when (and @report-p (> (length $changeLog) 0))
       (mapc
        (lambda ($x)
          (princ $x)
          (terpri))
        (reverse $changeLog)))
-
     $changeLog
     ))
 
@@ -116,7 +92,7 @@ Returns the new string.
 This function is a wrapper of `xah-replace-pairs-region'. See there for detail."
   (with-temp-buffer
     (insert @str)
-    (xah-replace-pairs-region 1 (point-max) @pairs)
+    (xah-replace-pairs-region (point-min) (point-max) @pairs)
     (buffer-string)))
 
 (defun xah-replace-regexp-pairs-region (@begin @end @pairs &optional @fixedcase-p @literal-p @hilight-p)
