@@ -115,7 +115,7 @@ Version 2017-02-21"
       (mapc
        (lambda ($x)
          (goto-char (point-min))
-         (while (search-forward-regexp (elt $x 0) (point-max) t)
+         (while (re-search-forward (elt $x 0) (point-max) t)
            (replace-match (elt $x 1) @fixedcase-p @literal-p)
            (when @hilight-p
              (overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'face 'highlight))))
