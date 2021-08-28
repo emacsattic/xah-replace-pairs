@@ -1,9 +1,9 @@
 ;;; xah-replace-pairs.el --- emacs lisp functions for multi-pair find/replace.  -*- coding: utf-8; lexical-binding: t; -*-
 
-;; Copyright © 2010-2020, by Xah Lee
+;; Copyright © 2010-2021 by Xah Lee
 
 ;; Author: Xah Lee ( http://xahlee.info/ )
-;; Version: 2.5.20210814190611
+;; Version: 2.5.20210828120450
 ;; Created: 17 Aug 2010
 ;; Package-Requires: ((emacs "24.1"))
 ;; Keywords: lisp, tools, find replace
@@ -42,42 +42,42 @@
 
 ;;; Code:
 
-(defun xah-replace-pairs-region (@begin @end @pairs &optional @report-p @hilight-p)
-  "Replace multiple @pairs of find/replace strings in region @begin @end.
+(defun xah-replace-pairs-region (Begin End Pairs &optional Report-p Hilight-p)
+  "Replace multiple Pairs of find/replace strings in region Begin End.
 
-@pairs is a sequence of pairs [[f1 r1] [f2 r2] …] each element or entire argument can be list or vector. f are find string, r are replace string.
+Pairs is a sequence of pairs [[f1 r1] [f2 r2] …] each element or entire argument can be list or vector. f are find string, r are replace string.
 
 Find strings case sensitivity depends on `case-fold-search'. The replacement are literal and case sensitive.
 
-Once a subsring in the buffer is replaced, that part will not change again.  For example, if the buffer content is “abcd”, and the @pairs are a → c and c → d, then, result is “cbdd”, not “dbdd”.
+Once a subsring in the buffer is replaced, that part will not change again.  For example, if the buffer content is “abcd”, and the Pairs are a → c and c → d, then, result is “cbdd”, not “dbdd”.
 
-@report-p is t or nil. If t, it prints each replaced pairs, one pair per line.
+Report-p is t or nil. If t, it prints each replaced pairs, one pair per line.
 
 Returns a list, each element is a vector [position findStr replaceStr].
 
 Version 2020-12-18"
   (let ( ($tempMapPoints nil) ($changeLog nil))
     ;; set $tempMapPoints, to unicode private use area chars
-    (dotimes (i (length @pairs)) (push (char-to-string (+ #xe000 i)) $tempMapPoints))
-    ;; (message "%s" @pairs)
+    (dotimes (i (length Pairs)) (push (char-to-string (+ #xe000 i)) $tempMapPoints))
+    ;; (message "%s" Pairs)
     ;; (message "%s" $tempMapPoints)
     (save-excursion
       (save-restriction
-        (narrow-to-region @begin @end)
-        (dotimes (i (length @pairs))
+        (narrow-to-region Begin End)
+        (dotimes (i (length Pairs))
           (goto-char (point-min))
-          (while (search-forward (elt (elt @pairs i) 0) nil t)
+          (while (search-forward (elt (elt Pairs i) 0) nil t)
             (replace-match (elt $tempMapPoints i) t t)))
-        (dotimes (i (length @pairs))
+        (dotimes (i (length Pairs))
           (goto-char (point-min))
           (while (search-forward (elt $tempMapPoints i) nil t)
             (push (vector (point)
-                          (elt (elt @pairs i) 0)
-                          (elt (elt @pairs i) 1)) $changeLog)
-            (replace-match (elt (elt @pairs i) 1) t t)
-            (when @hilight-p
+                          (elt (elt Pairs i) 0)
+                          (elt (elt Pairs i) 1)) $changeLog)
+            (replace-match (elt (elt Pairs i) 1) t t)
+            (when Hilight-p
               (overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'face 'highlight))))))
-    (when (and @report-p (> (length $changeLog) 0))
+    (when (and Report-p (> (length $changeLog) 0))
       (mapc
        (lambda ($x)
          (princ $x)
@@ -86,55 +86,55 @@ Version 2020-12-18"
     $changeLog
     ))
 
-(defun xah-replace-pairs-in-string (@str @pairs)
-  "Replace string @str by find/replace @pairs sequence.
+(defun xah-replace-pairs-in-string (Str Pairs)
+  "Replace string Str by find/replace Pairs sequence.
 Returns the new string.
 This function is a wrapper of `xah-replace-pairs-region'. See there for detail."
   (with-temp-buffer
-    (insert @str)
-    (xah-replace-pairs-region (point-min) (point-max) @pairs)
+    (insert Str)
+    (xah-replace-pairs-region (point-min) (point-max) Pairs)
     (buffer-string)))
 
-(defun xah-replace-regexp-pairs-region (@begin @end @pairs &optional @fixedcase-p @literal-p @hilight-p)
-  "Replace regex string find/replace @pairs in region.
+(defun xah-replace-regexp-pairs-region (Begin End Pairs &optional Fixedcase-p Literal-p Hilight-p)
+  "Replace regex string find/replace Pairs in region.
 
-@begin @end are the region boundaries.
+Begin End are the region boundaries.
 
-@pairs is
+Pairs is
  [[regexStr1 replaceStr1] [regexStr2 replaceStr2] …]
 It can be list or vector, for the elements or the entire argument.
 
-The optional arguments @fixedcase-p and @literal-p is the same as in `replace-match'.
-If @hilight-p is true, highlight the changed region.
+The optional arguments Fixedcase-p and Literal-p is the same as in `replace-match'.
+If Hilight-p is true, highlight the changed region.
 
 Find strings case sensitivity depends on `case-fold-search'. You can set it locally, like this: (let ((case-fold-search nil)) …)
 Version 2017-02-21 2021-08-14"
   (save-excursion
     (save-restriction
-      (narrow-to-region @begin @end)
+      (narrow-to-region Begin End)
       (mapc
        (lambda ($x)
          (goto-char (point-min))
          (while (re-search-forward (elt $x 0) (point-max) t)
-           (replace-match (elt $x 1) @fixedcase-p @literal-p)
-           (when @hilight-p
+           (replace-match (elt $x 1) Fixedcase-p Literal-p)
+           (when Hilight-p
              (overlay-put (make-overlay (match-beginning 0) (match-end 0)) 'face 'highlight))))
-       @pairs))))
+       Pairs))))
 
-(defun xah-replace-regexp-pairs-in-string (@str @pairs &optional @fixedcase-p @literal-p)
-  "Replace string @str recursively by regex find/replace pairs @pairs sequence.
+(defun xah-replace-regexp-pairs-in-string (Str Pairs &optional Fixedcase-p Literal-p)
+  "Replace string Str recursively by regex find/replace pairs Pairs sequence.
 
 This function is a wrapper of `xah-replace-regexp-pairs-region'. See there for detail.
 
 See also `xah-replace-pairs-in-string'."
   (with-temp-buffer
-    (insert @str)
+    (insert Str)
     (goto-char (point-min))
-    (xah-replace-regexp-pairs-region (point-min) (point-max) @pairs @fixedcase-p @literal-p)
+    (xah-replace-regexp-pairs-region (point-min) (point-max) Pairs Fixedcase-p Literal-p)
     (buffer-string)))
 
-(defun xah-replace-pairs-region-recursive (@begin @end @pairs)
-  "Replace multiple @pairs of find/replace strings in region @begin @end.
+(defun xah-replace-pairs-region-recursive (Begin End Pairs)
+  "Replace multiple Pairs of find/replace strings in region Begin End.
 
 This function is similar to `xah-replace-pairs-region', except that the replacement is done recursively after each find/replace pair.  Earlier replaced value may be replaced again.
 
@@ -143,25 +143,25 @@ For example, if the input string is “abcd”, and the pairs are a → c and c 
 Find strings case sensitivity depends on `case-fold-search'. You can set it locally, like this: (let ((case-fold-search nil)) …)
 
 The replacement are literal and case sensitive.
-Version 2017-02-21 2021-08-14"
+Version 2017-02-21"
   (save-excursion
     (save-restriction
-      (narrow-to-region @begin @end)
+      (narrow-to-region Begin End)
       (mapc
        (lambda (x)
          (goto-char (point-min))
          (while (search-forward (elt x 0) (point-max) t)
            (replace-match (elt x 1) t t)))
-       @pairs))))
+       Pairs))))
 
-(defun xah-replace-pairs-in-string-recursive (@str @pairs)
-  "Replace string @str recursively by find/replace pairs @pairs sequence.
+(defun xah-replace-pairs-in-string-recursive (Str Pairs)
+  "Replace string Str recursively by find/replace pairs Pairs sequence.
 
 This function is is a wrapper of `xah-replace-pairs-region-recursive'. See there for detail."
   (with-temp-buffer
-    (insert @str)
+    (insert Str)
     (goto-char (point-min))
-    (xah-replace-pairs-region-recursive (point-min) (point-max) @pairs)
+    (xah-replace-pairs-region-recursive (point-min) (point-max) Pairs)
     (buffer-string)))
 
 (provide 'xah-replace-pairs)
