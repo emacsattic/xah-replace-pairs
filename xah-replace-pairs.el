@@ -3,7 +3,7 @@
 ;; Copyright © 2010-2021 by Xah Lee
 
 ;; Author: Xah Lee ( http://xahlee.info/ )
-;; Version: 2.5.20210828120450
+;; Version: 2.5.20210906030129
 ;; Created: 17 Aug 2010
 ;; Package-Requires: ((emacs "24.1"))
 ;; Keywords: lisp, tools, find replace
@@ -39,7 +39,7 @@
 ;; 2015-04-28 major rewrite. This package was xfrp_find_replace_pairs
 ;; version 1.0, 2010-08-17. First version.
 
-
+;; HHH___________________________________________________________________
 ;;; Code:
 
 (defun xah-replace-pairs-region (Begin End Pairs &optional Report-p Hilight-p)
@@ -56,7 +56,22 @@ Report-p is t or nil. If t, it prints each replaced pairs, one pair per line.
 Returns a list, each element is a vector [position findStr replaceStr].
 
 Version 2020-12-18"
-  (let ( ($tempMapPoints nil) ($changeLog nil))
+  ;; 2021-09-06 the non intentional replacement happens when:
+  ;; a replace string is a superset or subset of subsequent find string.
+
+  ;; Example:
+  ;; text is: sa
+
+  ;; subset situation:
+  ;; a → p
+  ;; sp → b
+
+  ;; superset situation:
+  ;; a → op
+  ;; p → b
+
+  ;; for efficiency, to fix it and avoid intermediate find/replace. If any superset or subset occure, try to move the pair to the bottom. If still happens, then, those pair with the replacemen string super/sub issue needs a intermediate replacement
+  (let (($tempMapPoints nil) ($changeLog nil))
     ;; set $tempMapPoints, to unicode private use area chars
     (dotimes (i (length Pairs)) (push (char-to-string (+ #xe000 i)) $tempMapPoints))
     ;; (message "%s" Pairs)
